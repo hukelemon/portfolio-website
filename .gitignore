@@ -1,0 +1,7 @@
+node_modules/
+.next/
+*.mp4
+*.webm
+*.jpg
+*.png
+# Add any other file types or folders you want to ignore
