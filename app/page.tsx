@@ -10,13 +10,13 @@ const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@HukeIsMe/videos';
 const categories = [
   { name: 'About Me', content: 'profile' },
   { name: 'Contact Me', content: 'For collaborations' },
+  { name: 'YouTube', content: 'Scripted and edited projects', url: YOUTUBE_CHANNEL_URL },
   { name: 'Graphics', content: 'Visual designs and branding' },
   { name: 'Sports Graphics', content: 'Visuals for sports events' },
   { name: 'Animation', content: 'Bringing ideas to life' },
   { name: 'Short Form', content: 'Engaging bite-sized videos' },
   { name: 'Onboarding', content: 'User-friendly guides' },
-  { name: 'Icons', content: 'Custom icon designs' },
-  { name: 'YouTube', content: 'Scripted and edited projects', url: YOUTUBE_CHANNEL_URL }
+  { name: 'Icons', content: 'Custom icon designs' }
 ];
 
 export default function Home() {
@@ -26,14 +26,19 @@ export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoError, setVideoError] = useState<string | null>(null);
 
-  useEffect(() => {
+   useEffect(() => {
     const video = videoRef.current;
     if (video) {
       const handleCanPlay = () => {
         console.log("Video can play");
-        video.play().catch(error => {
+        setVideoStatus('Can play');
+        video.play().then(() => {
+          console.log("Video playing");
+          setVideoStatus('Playing');
+        }).catch(error => {
           console.error("Error playing video:", error);
           setVideoError(`Play error: ${error.message}`);
+          setVideoStatus('Play error');
         });
       };
 
@@ -41,17 +46,26 @@ export default function Home() {
         const error = (e.target as HTMLVideoElement).error;
         console.error("Video error:", error);
         setVideoError(`Video error: ${error?.message}`);
+        setVideoStatus('Error');
+      };
+
+      const handleLoadedMetadata = () => {
+        console.log("Video metadata loaded");
+        setVideoStatus('Metadata loaded');
       };
 
       video.addEventListener('canplay', handleCanPlay);
       video.addEventListener('error', handleError);
+      video.addEventListener('loadedmetadata', handleLoadedMetadata);
 
       // Force the video to load
       video.load();
+      setVideoStatus('Loading');
 
       return () => {
         video.removeEventListener('canplay', handleCanPlay);
         video.removeEventListener('error', handleError);
+        video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       };
     }
   }, []);
