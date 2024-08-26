@@ -26,50 +26,6 @@ export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoError, setVideoError] = useState<string | null>(null);
 
-   useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      const handleCanPlay = () => {
-        console.log("Video can play");
-        setVideoStatus('Can play');
-        video.play().then(() => {
-          console.log("Video playing");
-          setVideoStatus('Playing');
-        }).catch(error => {
-          console.error("Error playing video:", error);
-          setVideoError(`Play error: ${error.message}`);
-          setVideoStatus('Play error');
-        });
-      };
-
-      const handleError = (e: Event) => {
-        const error = (e.target as HTMLVideoElement).error;
-        console.error("Video error:", error);
-        setVideoError(`Video error: ${error?.message}`);
-        setVideoStatus('Error');
-      };
-
-      const handleLoadedMetadata = () => {
-        console.log("Video metadata loaded");
-        setVideoStatus('Metadata loaded');
-      };
-
-      video.addEventListener('canplay', handleCanPlay);
-      video.addEventListener('error', handleError);
-      video.addEventListener('loadedmetadata', handleLoadedMetadata);
-
-      // Force the video to load
-      video.load();
-      setVideoStatus('Loading');
-
-      return () => {
-        video.removeEventListener('canplay', handleCanPlay);
-        video.removeEventListener('error', handleError);
-        video.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      };
-    }
-  }, []);
-
   const openModal = async (category: string) => {
     if (category !== 'About Me' && category !== 'Contact Me' && category !== 'YouTube') {
       try {
