@@ -45,7 +45,15 @@ export default function Home() {
   };
 
   const fetchFilesFromS3 = async (category: string): Promise<string[]> => {
-    // ... (fetchFilesFromS3 function remains the same)
+    const files: string[] = [];
+    const folderName = category === 'Animation' ? 'Animation  ' : category;
+    for (let i = 1; i <= 10; i++) {
+      const fileExtension = ['mp4', 'webm'].includes(category.toLowerCase()) ? 'mp4' : 'png';
+      const fileName = `${folderName} (${i}).${fileExtension}`;
+      const fileUrl = `${S3_BUCKET_URL}/${encodeURIComponent(folderName)}/${encodeURIComponent(fileName)}`;
+      files.push(fileUrl);
+    }
+    return files;
   };
 
   const closeModal = () => {
@@ -62,7 +70,28 @@ export default function Home() {
   };
 
   const renderFile = (file: string) => {
-    // ... (renderFile function remains the same)
+    const extension = file.split('.').pop()?.toLowerCase();
+    if (['png', 'jpg', 'jpeg', 'gif'].includes(extension || '')) {
+      return (
+        <Image
+          src={file}
+          alt={file.split('/').pop() || ''}
+          width={300}
+          height={200}
+          objectFit="cover"
+          onClick={() => focusImage(file)}
+          className="modal-image"
+        />
+      );
+    } else if (['mp4', 'webm'].includes(extension || '')) {
+      return (
+        <video width="300" height="200" controls className="modal-video">
+          <source src={file} type={`video/${extension}`} />
+          Your browser does not support the video tag.
+        </video>
+      );
+    }
+    return null;
   };
 
   return (
@@ -112,7 +141,7 @@ export default function Home() {
                     <p>{category.content}</p>
                     {category.name === 'YouTube' ? (
                       <a 
-                        href={category.url} 
+                        href={YOUTUBE_CHANNEL_URL} 
                         target="_blank" 
                         rel="noopener noreferrer" 
                         className="see-more"
