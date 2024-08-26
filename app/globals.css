@@ -16,22 +16,6 @@
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
 body, html {
   margin: 0;
   padding: 0;
@@ -44,6 +28,7 @@ body, html {
 .container {
   position: relative;
   min-height: 100vh;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -52,30 +37,30 @@ body, html {
 
 .background-video {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  min-width: 100%;
-  min-height: 100%;
-  width: auto;
-  height: auto;
-  z-index: -1000;
-  transform: translateX(-50%) translateY(-50%);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  z-index: 0;
 }
 
 .main {
   position: relative;
   width: 100%;
-  max-width: 600px;
   padding: 20px;
   z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 180px);
   gap: 10px;
   justify-content: center;
+  margin-left: right; /* Changed from negative to positive */
 }
 
 .card {
