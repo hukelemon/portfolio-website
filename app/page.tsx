@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 
-const S3_BUCKET_URL = 'https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder';
 const BACKGROUND_VIDEO_URL = 'https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/Background.mp4';
 const PROFILE_PICTURE_URL = 'https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/portrait.jpg';
 const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@HukeIsMe/videos';
@@ -25,10 +24,35 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [focusedImage, setFocusedImage] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.play().catch(error => console.error("Error playing video:", error));
+    const video = videoRef.current;
+    if (video) {
+      const handleCanPlay = () => {
+        console.log("Video can play");
+        video.play().catch(error => {
+          console.error("Error playing video:", error);
+          setVideoError(`Play error: ${error.message}`);
+        });
+      };
+
+      const handleError = (e: Event) => {
+        const error = (e.target as HTMLVideoElement).error;
+        console.error("Video error:", error);
+        setVideoError(`Video error: ${error?.message}`);
+      };
+
+      video.addEventListener('canplay', handleCanPlay);
+      video.addEventListener('error', handleError);
+
+      // Force the video to load
+      video.load();
+
+      return () => {
+        video.removeEventListener('canplay', handleCanPlay);
+        video.removeEventListener('error', handleError);
+      };
     }
   }, []);
 
@@ -45,12 +69,12 @@ export default function Home() {
   };
 
   const fetchFilesFromS3 = async (category: string): Promise<string[]> => {
-    const files: string[] = [];
     const folderName = category === 'Animation' ? 'Animation  ' : category;
+    const files: string[] = [];
     for (let i = 1; i <= 10; i++) {
       const fileExtension = ['mp4', 'webm'].includes(category.toLowerCase()) ? 'mp4' : 'png';
       const fileName = `${folderName} (${i}).${fileExtension}`;
-      const fileUrl = `${S3_BUCKET_URL}/${encodeURIComponent(folderName)}/${encodeURIComponent(fileName)}`;
+      const fileUrl = `${BACKGROUND_VIDEO_URL}/${encodeURIComponent(folderName)}/${encodeURIComponent(fileName)}`;
       files.push(fileUrl);
     }
     return files;
@@ -96,6 +120,11 @@ export default function Home() {
 
   return (
     <div className="container">
+      {videoError && (
+        <div style={{ position: 'fixed', top: 0, left: 0, background: 'red', color: 'white', padding: '10px', zIndex: 9999 }}>
+          {videoError}
+        </div>
+      )}
       <video 
         ref={videoRef}
         autoPlay 
@@ -141,7 +170,7 @@ export default function Home() {
                     <p>{category.content}</p>
                     {category.name === 'YouTube' ? (
                       <a 
-                        href={YOUTUBE_CHANNEL_URL} 
+                        href={category.url} 
                         target="_blank" 
                         rel="noopener noreferrer" 
                         className="see-more"
