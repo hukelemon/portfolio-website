@@ -8,10 +8,10 @@ const ICON_URL = "https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+fol
 const BANNER_URL = "https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/banner.png";
 
 export const metadata: Metadata = {
-  title: "You're obsessed",
+  title: "You're obsessed with me",
   description: "Scott's portfolio - Let's work together on your next project!",
   openGraph: {
-    title: "You're obsessed",
+    title: "You're obsessed with me",
     description: "Scott's portfolio - Let's work together on your next project!",
     url: "https://www.howtohirescott.com/",
     siteName: "How to Hire Scott",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "You're obsessed",
+    title: "You're obsessed with me",
     description: "Scott's portfolio - Let's work together on your next project!",
     images: [BANNER_URL],
   },
