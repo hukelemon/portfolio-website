@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Scott's Portfolio",
-    description: "Scott's portfolio - Let's work together on your next project!",
+    description: "Let's work together on your next project!",
     images: [BANNER_URL],
   },
   icons: {
