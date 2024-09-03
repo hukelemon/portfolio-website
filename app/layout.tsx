@@ -4,11 +4,12 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const ICON_URL_32 = "https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/icon-32x32.png";
-const ICON_URL_16 = "https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/icon-16x16.png";
-const ICON_URL_APPLE = "https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/icon-180x180.png";
-const ICON_URL_ICO = "https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/favicon.ico";
-const BANNER_URL = "https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/banner.png";
+const S3_BASE_URL = "https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/";
+const ICON_URL_32 = `${S3_BASE_URL}icon-32x32.png`;
+const ICON_URL_16 = `${S3_BASE_URL}icon-16x16.png`;
+const ICON_URL_180 = `${S3_BASE_URL}icon-180x180.png`;
+const ICON_URL_ICO = `${S3_BASE_URL}favicon.ico`;
+const BANNER_URL = `${S3_BASE_URL}banner.png`;
 
 export const metadata: Metadata = {
   title: "Scott's Portfolio",
@@ -42,8 +43,9 @@ export const metadata: Metadata = {
       { url: ICON_URL_ICO, sizes: '48x48', type: 'image/x-icon' },
     ],
     apple: [
-      { url: ICON_URL_APPLE, sizes: '180x180', type: 'image/png' },
+      { url: ICON_URL_180, sizes: '180x180', type: 'image/png' },
     ],
+    shortcut: [{ url: ICON_URL_ICO }],
   },
 };
 
@@ -55,6 +57,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="shortcut icon" href={ICON_URL_ICO} />
         <link rel="icon" href={ICON_URL_ICO} sizes="any" />
       </head>
       <body className={inter.className}>{children}</body>
