@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 const BACKGROUND_VIDEO_URL = 'https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/Background.mp4';
 const PROFILE_PICTURE_URL = 'https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/portrait.jpg';
 const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@HukeIsMe/videos';
+const S3_BASE_URL = 'https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/';
 
 const categories = [
   { name: 'About Me', content: 'profile' },
@@ -16,7 +17,7 @@ const categories = [
   { name: 'Animation', content: 'Bringing ideas to life' },
   { name: 'Short Form', content: 'Engaging bite-sized videos' },
   { name: 'Onboarding', content: 'User-friendly guides' },
-  { name: 'Icons', content: 'Custom icon designs' }
+  { name: 'Thumbnails', content: 'Custom thumbnail designs' }
 ];
 
 export default function Home() {
@@ -41,12 +42,33 @@ export default function Home() {
   const fetchFilesFromS3 = async (category: string): Promise<string[]> => {
     const folderName = category === 'Animation' ? 'Animation  ' : category;
     const files: string[] = [];
-    for (let i = 1; i <= 10; i++) {
-      const fileExtension = ['mp4', 'webm'].includes(category.toLowerCase()) ? 'mp4' : 'png';
-      const fileName = `${folderName} (${i}).${fileExtension}`;
-      const fileUrl = `${BACKGROUND_VIDEO_URL}/${encodeURIComponent(folderName)}/${encodeURIComponent(fileName)}`;
-      files.push(fileUrl);
+    const maxFiles = 20; // Increase this number if you have more files in some categories
+
+    for (let i = 1; i <= maxFiles; i++) {
+      const fileExtensions = ['png', 'jpg', 'mp4', 'webm'];
+      let fileFound = false;
+
+      for (const ext of fileExtensions) {
+        const fileName = `${folderName} (${i}).${ext}`;
+        const fileUrl = `${S3_BASE_URL}${encodeURIComponent(folderName)}/${encodeURIComponent(fileName)}`;
+
+        try {
+          const response = await fetch(fileUrl, { method: 'HEAD' });
+          if (response.ok) {
+            files.push(fileUrl);
+            fileFound = true;
+            break;
+          }
+        } catch (error) {
+          console.error(`Error checking file ${fileName}:`, error);
+        }
+      }
+
+      if (!fileFound) {
+        break; // Stop searching if no file is found for this index
+      }
     }
+
     return files;
   };
 
