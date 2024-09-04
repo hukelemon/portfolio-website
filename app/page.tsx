@@ -40,17 +40,17 @@ export default function Home() {
   };
 
   const fetchFilesFromS3 = async (category: string): Promise<string[]> => {
-    const folderName = category === 'Animation' ? 'Animation  ' : category;
+    const folderName = category.replace(' ', '%20');
     const files: string[] = [];
-    const maxFiles = 20; // Increase this number if you have more files in some categories
+    const maxFiles = 20;
 
     for (let i = 1; i <= maxFiles; i++) {
       const fileExtensions = ['png', 'jpg', 'mp4', 'webm'];
       let fileFound = false;
 
       for (const ext of fileExtensions) {
-        const fileName = `${folderName} (${i}).${ext}`;
-        const fileUrl = `${S3_BASE_URL}${encodeURIComponent(folderName)}/${encodeURIComponent(fileName)}`;
+        const fileName = `${category} (${i}).${ext}`;
+        const fileUrl = `${S3_BASE_URL}${folderName}/${encodeURIComponent(fileName)}`;
 
         try {
           const response = await fetch(fileUrl, { method: 'HEAD' });
@@ -65,7 +65,7 @@ export default function Home() {
       }
 
       if (!fileFound) {
-        break; // Stop searching if no file is found for this index
+        break;
       }
     }
 
