@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 const BACKGROUND_VIDEO_URL = 'https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/Background.mp4';
 const PROFILE_PICTURE_URL = 'https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/portrait.jpg';
 const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@HukeIsMe/videos';
-const S3_BASE_URL = 'https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/';
+const S3_BASE_URL = 'https://scottsportfolio1996.s3.us-east-2.amazonaws.com/';
 
 const categories = [
   { name: 'About Me', content: 'profile' },
@@ -29,46 +29,106 @@ export default function Home() {
 
   const openModal = async (category: string) => {
     if (category !== 'About Me' && category !== 'Contact Me' && category !== 'YouTube') {
+      console.log(`Opening modal for category: ${category}`);
       try {
         const files = await fetchFilesFromS3(category);
-        setModalContent({ title: category, files });
-        setIsModalOpen(true);
+        if (files.length === 0) {
+          console.error(`No files found for ${category}`);
+          alert(`No files found for ${category}. Please check the console for more details.`);
+        } else {
+          console.log(`Found ${files.length} files for ${category}`);
+          setModalContent({ title: category, files });
+          setIsModalOpen(true);
+        }
       } catch (error) {
-        console.error('Error loading files:', error);
+        console.error(`Error loading files for ${category}:`, error);
+        alert(`Error loading files for ${category}. Please check the console for more details.`);
       }
     }
   };
 
+  const testS3Access = async () => {
+    const testFileUrl = 'https://scottsportfolio1996.s3.us-east-2.amazonaws.com/New+folder/Animation/Animation+(1).mp4';
+    console.log(`Testing S3 access with file: ${testFileUrl}`);
+  
+    try {
+      const response = await fetch(testFileUrl, { method: 'HEAD' });
+      console.log(`Test file response status: ${response.status}`);
+      if (response.ok) {
+        console.log('S3 test file is accessible');
+        alert('S3 test file is accessible');
+      } else {
+        console.error(`S3 test file is not accessible. Status: ${response.status}`);
+        alert(`S3 test file is not accessible. Status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error accessing S3 test file:', error);
+      alert('Error accessing S3 test file. Check console for details.');
+    }
+  };
+  
+  // Add this button to your JSX
+  <button onClick={testS3Access}>Test S3 Access</button>
+
+
   const fetchFilesFromS3 = async (category: string): Promise<string[]> => {
-    const folderName = category.replace(' ', '%20');
+    console.log(`Fetching files for category: ${category}`);
     const files: string[] = [];
     const maxFiles = 20;
-
-    for (let i = 1; i <= maxFiles; i++) {
+  
+    // Handle special cases for folder names
+    const folderMappings: { [key: string]: string } = {
+      "Short Form": "Short+Form",
+      "Onboarding": "onboarding",
+      "Animation": "Animation",
+      "Thumbnails": "Thumbnails"
+    };
+    const folderName = folderMappings[category] || category;
+  
+    // Handle special cases for file names
+    const fileNameMappings: { [key: string]: string } = {
+      "Short Form": "Short form",
+      "Animation": "animation ",
+      "Thumbnails": "thumbnails"
+    };
+    const baseFileName = fileNameMappings[category] || category;
+  
+    const startIndex = category === "Onboarding" ? 0 : 1;
+  
+    for (let i = startIndex; i <= maxFiles; i++) {
       const fileExtensions = ['png', 'jpg', 'mp4', 'webm'];
       let fileFound = false;
-
+  
       for (const ext of fileExtensions) {
-        const fileName = `${category} (${i}).${ext}`;
-        const fileUrl = `${S3_BASE_URL}${folderName}/${encodeURIComponent(fileName)}`;
-
+        const fileName = `${baseFileName} (${i}).${ext}`;
+        // Don't encode the space and parentheses in the file name
+        const encodedFileName = fileName.replace(/ /g, '+').replace(/\(/g, '%28').replace(/\)/g, '%29');
+        const fileUrl = `${S3_BASE_URL}New+folder/${folderName}/${encodedFileName}`;
+        console.log(`Checking file: ${fileUrl}`);
+  
         try {
           const response = await fetch(fileUrl, { method: 'HEAD' });
+          console.log(`Response status for ${fileUrl}: ${response.status}`);
           if (response.ok) {
             files.push(fileUrl);
             fileFound = true;
+            console.log(`File found and added: ${fileUrl}`);
             break;
+          } else {
+            console.log(`File not found: ${fileUrl}`);
           }
         } catch (error) {
           console.error(`Error checking file ${fileName}:`, error);
         }
       }
-
-      if (!fileFound) {
+  
+      if (!fileFound && i > startIndex) {
+        console.log(`No more files found after ${i - 1} files`);
         break;
       }
     }
-
+  
+    console.log(`Total files found for ${category}:`, files.length);
     return files;
   };
 
