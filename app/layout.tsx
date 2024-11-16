@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -59,8 +60,25 @@ export default function RootLayout({
       <head>
         <link rel="shortcut icon" href={ICON_URL_ICO} />
         <link rel="icon" href={ICON_URL_ICO} sizes="any" />
+        <style>
+          {/* bg-canvas full width/height absolute position at back */}
+          {`
+            .bg-canvas {
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+            }
+          `}
+        </style>
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <div className="bg-canvas" data-us-project="CdHCsuh8OTuaVKAlPPKc?update=1.5"></div>
+        <Script src="https://cdn.unicorn.studio/v1.3.1/unicornStudio.umd.js" strategy="beforeInteractive"/>
+        <Script src="/scripts/background-script.js" strategy="afterInteractive"/>
+        {children}
+        </body>
     </html>
   );
 }
