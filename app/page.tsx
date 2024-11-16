@@ -177,7 +177,7 @@ export default function Home() {
           {videoError}
         </div>
       )}
-      <video 
+      {/* <video 
         ref={videoRef}
         autoPlay 
         loop 
@@ -187,7 +187,7 @@ export default function Home() {
       >
         <source src={BACKGROUND_VIDEO_URL} type="video/mp4" />
         Your browser does not support the video tag.
-      </video>
+      </video> */}
 
       <main className="main">
         <div className="grid">
